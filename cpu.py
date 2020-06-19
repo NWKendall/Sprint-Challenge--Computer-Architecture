@@ -14,6 +14,7 @@ class CPU:
         # stack counter
         self.sp = 7
         self.return_pc = 0
+        self.FL = 0b00000000
         # self.stack_start = 16
         # self.stack_end = 240
         # self.stacksize = "?"
@@ -31,6 +32,10 @@ class CPU:
         self.POP = 0b01000110
         self.CALL = 0b01010000
         self.RET = 0b00010001
+        self.CMP = 0b10100111
+        self.JNE = 0b01010110
+        self.JEQ = 0b01010101
+        self.JMP = 0b01010100
 
     def load(self, program):
         """Load a program into memory."""
@@ -77,6 +82,10 @@ class CPU:
                 self.POP: self.pop,
                 self.CALL: self.call,
                 self.RET: self.ret,
+                self.CMP: self.comp,
+                self.JMP: self.jump,
+                self.JNE: self.jne,
+                self.JEQ: self.jeq
             }
             if IR in branch_table:
                 branch_table[IR]()
@@ -111,6 +120,13 @@ class CPU:
             self.reg[reg_a] %= self.reg[reg_b]
             self.pc += 3
             print(f"MUL at REG[{reg_a}]: {self.reg[reg_a]}")
+        elif op == "CMP":
+            if reg_a > reg_b:
+                self.FL = 0b00000100
+            elif reg_a < reg_b:
+                self.FL = 0b00000010
+            elif reg_a == reg_b:
+                self.FL = 0b00000001
         else:
             raise Exception(f"Unsupported ALU operation: {op}")
             self.trace()
@@ -234,6 +250,24 @@ class CPU:
         top_of_stack_address = self.reg[self.sp]
         return_pc = self.ram[top_of_stack_address]
         self.pc = return_pc
+    
+    def comp(self):
+        self.alu("CMP", 0, 1)
+        self.pc += 2
+
+    def jump(self):
+        address = self.ram_read(self.pc + 1)
+        self.pc = self.reg[address]
+
+    def jne(self):
+        pass
+    
+    def jqe(self):
+        pass
+
+    
+
+    
 
         
 """
@@ -267,5 +301,16 @@ Research:
         - Advanced Programming in the UNIX Environment, 3rd Editio
 
 lambda: reg_a, reg_b: reg[reg_a] += reg[reb_b]
+
+SPRINT:
+    Need self.fl ✅
+    add CMP to ALU ✅
+        if a == b
+            add JEQ as method
+        if a > b 
+            add JMP as method
+        if a < b
+        add JEN as method
+
 
 """
