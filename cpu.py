@@ -121,11 +121,12 @@ class CPU:
             self.pc += 3
             print(f"MUL at REG[{reg_a}]: {self.reg[reg_a]}")
         elif op == "CMP":
-            if reg_a > reg_b:
+            print("CMP FIRED", "R[0]:", self.reg[reg_a], ", R[1]:", self.reg[reg_b])
+            if self.reg[reg_a] < self.reg[reg_b]:
                 self.FL = 0b00000100
-            elif reg_a < reg_b:
+            elif self.reg[reg_a] > self.reg[reg_b]:
                 self.FL = 0b00000010
-            elif reg_a == reg_b:
+            elif self.reg[reg_a] == self.reg[reg_b]:
                 self.FL = 0b00000001
         else:
             raise Exception(f"Unsupported ALU operation: {op}")
@@ -170,6 +171,7 @@ class CPU:
         reg_id = self.ram[self.pc + 1]
         self.reg[reg_id]
         print("Returning", self.reg[reg_id])
+        print("RET REG", self.reg)
         self.pc += 2
 
     def ldi(self):
@@ -193,6 +195,10 @@ class CPU:
 
     def mod(self):
         self.alu("MOD", 0, 1)
+
+    def comp(self):
+        self.alu("CMP", 0, 1)
+        self.pc += 3
 
     def push(self):
         # decrements the VALUE stored at reg[7], which is the address in Stack, "new head"
@@ -251,25 +257,55 @@ class CPU:
         return_pc = self.ram[top_of_stack_address]
         self.pc = return_pc
     
-    def comp(self):
-        self.alu("CMP", 0, 1)
-        self.pc += 2
 
     def jump(self):
+        # get address of next instruction
         address = self.ram_read(self.pc + 1)
+        # print("JMP Address:", address)
+        # teleport there
         self.pc = self.reg[address]
 
     def jne(self):
-        pass
-    
-    def jqe(self):
-        pass
+        print("JNE FLAG:", self.FL)
+        # if reg entries are not equal
+        if self.FL is not 1:
+            # get address from ram
+            address = self.ram_read(self.pc + 1)
+            # save that value in reg
+            jump_loc = self.reg[address]
+            print("JNE REG Address:", address)
 
-    
+            print("JNE Value at Address:", jump_loc)
+            print("REG:", self.reg)
 
-    
+            print("RAM", self.ram)
 
-        
+            # teletport counter to deal with subroutine
+            self.pc = jump_loc
+        else:
+            # otherwise go to next instruction
+            self.pc += 2
+
+    def jeq(self):
+        # if reg entries equal condition is met
+        print("JEQ FLAG:", self.FL)
+        if self.FL is 1:
+            # get address from ram
+            address = self.ram_read(self.pc + 1)
+            print("JEQ Address:", address)
+
+            # save that value in reg
+            jump_loc = self.reg[address]
+            print("JEQ Value at Address:", jump_loc)
+            print("REG:", self.reg)
+
+
+            print("RAM", self.ram)
+            # teletport counter to deal with subroutine
+            self.pc = jump_loc
+        else:
+            self.pc += 2
+
 """
 Todos:
     Instructions for implementing each day?
@@ -311,6 +347,8 @@ SPRINT:
             add JMP as method
         if a < b
         add JEN as method
+
+    
 
 
 """
