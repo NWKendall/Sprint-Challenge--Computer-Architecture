@@ -1,0 +1,32 @@
+#                           PC
+10000010 # LDI R0,1         0
+00000000 # at reg 0         1
+00000001 # save value 1     2
+10000010 # LDI R1,2         3
+00000001 # at reg 1         4   
+00000010 # save val 2       5
+01000101 # PUSH R0          6
+00000000 # save value at reg 0 at new index on stack
+01000101 # PUSH R1
+00000001 # value 1
+10000010 # LDI R0,3
+00000000 # at reg 0
+00000011 # save value 3
+01000110 # POP R0
+00000000 # at reg 0
+01000111 # PRN R0               RETURNS 2
+00000000 # at reg 0
+10000010 # LDI R0,4
+00000000 # at reg 0
+00000100 # save val 4
+01000101 # PUSH R0
+00000000 # get reg 0
+01000110 # POP R2
+00000010 # get reg 2
+01000110 # POP R1
+00000001 # get reg 1
+01000111 # PRN R2               RETURNS 4
+00000010 # get reg 2
+01000111 # PRN R1               RETURNS 1
+00000001 # get reg 1
+00000001 # HLT
